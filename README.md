@@ -44,7 +44,14 @@ files + a `.gitignore` entry: secrets stay on the server.
 
 ```bash
 npm install
+copy .env.local.example .env.local
 npm run dev
+```
+
+Then open `.env.local` and replace the placeholder with your own Gemini API key:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
 Open the local preview URL shown in your terminal.
