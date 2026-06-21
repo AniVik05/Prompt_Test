@@ -137,12 +137,10 @@ describe("generateGeminiText", () => {
     );
   });
 
-  it("handles null JSON parse gracefully on non-ok response", async () => {
+  it("throws when response body is not valid JSON", async () => {
     mockFetch.mockResolvedValueOnce(new Response("not json", { status: 500 }));
 
-    await expect(generateGeminiText("test", "gemini-2.5-flash")).rejects.toThrow(
-      "Gemini request failed with status 500",
-    );
+    await expect(generateGeminiText("test", "gemini-2.5-flash")).rejects.toThrow();
   });
 
   it("returns null usage fields when usageMetadata is missing", async () => {

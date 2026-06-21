@@ -13,7 +13,7 @@ describe("getServerConfig", () => {
   });
 
   it("returns undefined nodeEnv when NODE_ENV is not set", () => {
-    delete process.env.NODE_ENV;
+    vi.stubEnv("NODE_ENV", undefined as unknown as string);
     const config = getServerConfig();
     expect(config.nodeEnv).toBeUndefined();
   });

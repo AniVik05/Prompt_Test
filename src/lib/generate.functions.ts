@@ -9,10 +9,28 @@ const MODEL_MAP = {
   gemini: "gemini-2.5-flash",
 } as const;
 
-const InputSchema = z.object({
+export const InputSchema = z.object({
   prompt: z.string().min(1, "Prompt cannot be empty").max(5000),
   model: z.enum(["gemini"]),
 });
+
+export function mapGeminiError(err: unknown): Error {
+  const message = err instanceof Error ? err.message : String(err);
+  if (/429/.test(message)) {
+    return new Error("Rate limit reached. Please wait a moment and try again.");
+  }
+  if (/402/.test(message)) {
+    return new Error("AI credits exhausted. Add credits to keep generating.");
+  }
+  if (/400/.test(message)) {
+    return new Error("Gemini rejected the request. Check the model name and API key restrictions.");
+  }
+  if (/401|403|api key|permission/i.test(message)) {
+    return new Error("Invalid API key detected on the server.");
+  }
+  console.error("[generatePrompt] Unexpected AI error:", message);
+  return new Error("AI request failed. Please try again later.");
+}
 
 export const generatePrompt = createServerFn({ method: "POST" })
   .validator((data: unknown) => InputSchema.parse(data))
@@ -49,23 +67,6 @@ export const generatePrompt = createServerFn({ method: "POST" })
         usage: result.usage,
       };
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      // Surface common Gemini errors with friendly text.
-      if (/429/.test(message)) {
-        throw new Error("Rate limit reached. Please wait a moment and try again.");
-      }
-      if (/402/.test(message)) {
-        throw new Error("AI credits exhausted. Add credits to keep generating.");
-      }
-      if (/400/.test(message)) {
-        throw new Error(
-          "Gemini rejected the request. Check the model name and API key restrictions.",
-        );
-      }
-      if (/401|403|api key|permission/i.test(message)) {
-        throw new Error("Invalid API key detected on the server.");
-      }
-      console.error("[generatePrompt] Unexpected AI error:", message);
-      throw new Error("AI request failed. Please try again later.");
+      throw mapGeminiError(err);
     }
   });
