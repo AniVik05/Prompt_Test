@@ -35,7 +35,10 @@ function Index() {
   const generateFn = useServerFn(generatePrompt);
   const mutation = useMutation<GenerateResult, Error, { prompt: string; model: "gemini" }>({
     mutationFn: (vars) => generateFn({ data: vars }),
-    onError: (err) => setError(err.message),
+    onError: (err) => {
+      console.error("[generatePrompt] Mutation failed:", err);
+      setError(err.message);
+    },
     onSuccess: () => setError(null),
   });
 

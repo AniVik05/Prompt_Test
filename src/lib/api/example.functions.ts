@@ -14,7 +14,13 @@ import { getServerConfig } from "../config.server";
 export const getGreeting = createServerFn({ method: "POST" })
   .validator((data: unknown) => z.object({ name: z.string().min(1) }).parse(data))
   .handler(async ({ data }) => {
-    const config = getServerConfig();
+    let config: ReturnType<typeof getServerConfig>;
+    try {
+      config = getServerConfig();
+    } catch (err) {
+      console.error("[getGreeting] Failed to load server config:", err);
+      throw new Error("Server configuration is unavailable.");
+    }
     return {
       greeting: `Hello, ${data.name}!`,
       mode: config.nodeEnv ?? "unknown",

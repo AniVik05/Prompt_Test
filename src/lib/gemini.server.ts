@@ -32,6 +32,11 @@ export async function generateGeminiText(prompt: string, model: string) {
     throw new Error("Missing GEMINI_API_KEY on the server.");
   }
 
+  const sanitizedPrompt = prompt.trim().slice(0, 5000);
+  if (!sanitizedPrompt) {
+    throw new Error("Prompt cannot be empty.");
+  }
+
   const response = await fetch(`${GEMINI_API_BASE_URL}/models/${model}:generateContent`, {
     method: "POST",
     headers: {
@@ -42,15 +47,25 @@ export async function generateGeminiText(prompt: string, model: string) {
       contents: [
         {
           role: "user",
-          parts: [{ text: prompt }],
+          parts: [{ text: sanitizedPrompt }],
         },
       ],
     }),
   });
 
-  const payload = (await response.json().catch(() => null)) as
-    | (GeminiGenerateResponse & GeminiErrorResponse)
-    | null;
+  let payload: (GeminiGenerateResponse & GeminiErrorResponse) | null = null;
+  try {
+    payload = (await response.json()) as GeminiGenerateResponse & GeminiErrorResponse;
+  } catch (parseError) {
+    const rawBody = await response
+      .clone()
+      .text()
+      .catch(() => "[unreadable body]");
+    console.error("Gemini response JSON parse failed:", parseError, "Raw body:", rawBody);
+    throw new Error(
+      `Gemini returned a non-JSON response (HTTP ${response.status}). Body: ${rawBody.slice(0, 200)}`,
+    );
+  }
 
   if (!response.ok) {
     const message =
