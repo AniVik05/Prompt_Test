@@ -44,7 +44,7 @@ files + a `.gitignore` entry: secrets stay on the server.
 
 ```bash
 npm install
-copy .env.local.example .env.local
+cp .env.local.example .env.local
 npm run dev
 ```
 
@@ -73,4 +73,3 @@ Open the local preview URL shown in your terminal.
    consumed; this is what providers charge for.
 5. **Error handling** — try an empty prompt, or unplug your network, and watch
    the friendly error messages.
-testing git

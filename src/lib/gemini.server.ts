@@ -32,23 +32,21 @@ export async function generateGeminiText(prompt: string, model: string) {
     throw new Error("Missing GEMINI_API_KEY on the server.");
   }
 
-  const response = await fetch(
-    `${GEMINI_API_BASE_URL}/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: prompt }],
-          },
-        ],
-      }),
+  const response = await fetch(`${GEMINI_API_BASE_URL}/models/${model}:generateContent`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": apiKey,
     },
-  );
+    body: JSON.stringify({
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: prompt }],
+        },
+      ],
+    }),
+  });
 
   const payload = (await response.json().catch(() => null)) as
     | (GeminiGenerateResponse & GeminiErrorResponse)
@@ -56,9 +54,10 @@ export async function generateGeminiText(prompt: string, model: string) {
 
   if (!response.ok) {
     const message =
-      payload?.error?.message ??
-      `Gemini request failed with status ${response.status}.`;
-    throw new Error(message);
+      payload?.error?.message ?? `Gemini request failed with status ${response.status}.`;
+    const error = new Error(message);
+    (error as Error & { statusCode: number }).statusCode = response.status;
+    throw error;
   }
 
   const text =

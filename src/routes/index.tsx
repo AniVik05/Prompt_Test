@@ -16,8 +16,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Prompt Tester — Learn AI APIs" },
       {
         property: "og:description",
-        content:
-          "Educational playground for testing and comparing AI prompts.",
+        content: "Educational playground for testing and comparing AI prompts.",
       },
     ],
   }),
@@ -26,9 +25,7 @@ export const Route = createFileRoute("/")({
 
 type GenerateResult = Awaited<ReturnType<typeof generatePrompt>>;
 
-const MODELS = [
-  { value: "gemini", label: "Google Gemini" },
-] as const;
+const MODELS = [{ value: "gemini", label: "Google Gemini" }] as const;
 
 function Index() {
   const [prompt, setPrompt] = useState("");
@@ -58,6 +55,7 @@ function Index() {
   const handleClear = () => {
     setPrompt("");
     setError(null);
+    mutation.reset();
   };
 
   return (
@@ -70,9 +68,7 @@ function Index() {
               <SparkIcon />
             </div>
             <div>
-              <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                Prompt Tester
-              </h1>
+              <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Prompt Tester</h1>
               <p className="text-sm text-muted-foreground sm:text-base">
                 Test and compare prompts using AI APIs
               </p>
@@ -196,20 +192,9 @@ function Index() {
                 <UsageRow label="Model used" value={result?.modelId ?? "—"} />
                 <UsageRow
                   label="API call status"
-                  value={
-                    isLoading
-                      ? "In progress"
-                      : result
-                        ? "Success"
-                        : error
-                          ? "Error"
-                          : "Idle"
-                  }
+                  value={isLoading ? "In progress" : result ? "Success" : error ? "Error" : "Idle"}
                 />
-                <UsageRow
-                  label="Response time"
-                  value={result?.responseTime ?? "—"}
-                />
+                <UsageRow label="Response time" value={result?.responseTime ?? "—"} />
                 <UsageRow
                   label="Prompt tokens"
                   value={result?.usage?.promptTokens?.toString() ?? "—"}
@@ -261,9 +246,7 @@ function Index() {
 function MetaPill({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-border bg-background/40 px-3 py-2">
-      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-        {label}
-      </div>
+      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
       <div className="mt-0.5 truncate text-sm text-foreground">{value}</div>
     </div>
   );
@@ -296,7 +279,12 @@ function Spinner() {
       aria-hidden="true"
     >
       <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.25" strokeWidth="4" />
-      <path d="M22 12a10 10 0 0 1-10 10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+      <path
+        d="M22 12a10 10 0 0 1-10 10"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -308,7 +296,10 @@ function SparkIcon() {
         d="M12 3l1.8 4.6L18.4 9.4 13.8 11.2 12 15.8 10.2 11.2 5.6 9.4 10.2 7.6 12 3z"
         fill="currentColor"
       />
-      <path d="M19 14l.9 2.3L22 17.2l-2.1.9L19 20.4l-.9-2.3L16 17.2l2.1-.9L19 14z" fill="currentColor" />
+      <path
+        d="M19 14l.9 2.3L22 17.2l-2.1.9L19 20.4l-.9-2.3L16 17.2l2.1-.9L19 14z"
+        fill="currentColor"
+      />
     </svg>
   );
 }
