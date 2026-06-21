@@ -22,7 +22,7 @@ export function reportLovableError(error: unknown, context: Record<string, unkno
   if (typeof window === "undefined") return;
 
   if (!window.__lovableEvents?.captureException) {
-    console.error(
+    console.warn(
       "[lovable-error-reporting] Error reporting unavailable; logging locally:",
       error,
       context,

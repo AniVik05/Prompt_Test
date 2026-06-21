@@ -55,14 +55,12 @@ export async function generateGeminiText(prompt: string, model: string) {
     },
   );
 
+  const responseClone = response.clone();
   let payload: (GeminiGenerateResponse & GeminiErrorResponse) | null = null;
   try {
     payload = (await response.json()) as GeminiGenerateResponse & GeminiErrorResponse;
   } catch (parseError) {
-    const rawBody = await response
-      .clone()
-      .text()
-      .catch(() => "[unreadable body]");
+    const rawBody = await responseClone.text().catch(() => "[unreadable body]");
     console.error("Gemini response JSON parse failed:", parseError, "Raw body:", rawBody);
     throw new Error(
       `Gemini returned a non-JSON response (HTTP ${response.status}). Body: ${rawBody.slice(0, 200)}`,
