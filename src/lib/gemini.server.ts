@@ -32,6 +32,11 @@ export async function generateGeminiText(prompt: string, model: string) {
     throw new Error("Missing GEMINI_API_KEY on the server.");
   }
 
+  const sanitizedPrompt = prompt.trim().slice(0, 5000);
+  if (!sanitizedPrompt) {
+    throw new Error("Prompt cannot be empty.");
+  }
+
   const response = await fetch(
     `${GEMINI_API_BASE_URL}/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`,
     {
@@ -43,7 +48,7 @@ export async function generateGeminiText(prompt: string, model: string) {
         contents: [
           {
             role: "user",
-            parts: [{ text: prompt }],
+            parts: [{ text: sanitizedPrompt }],
           },
         ],
       }),

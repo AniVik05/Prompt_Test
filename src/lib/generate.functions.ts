@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { generateGeminiText } from "./gemini.server";
+import { checkRateLimit } from "./rate-limit.server";
 
 // Map friendly model keys to Gemini model strings.
 // Students: this is where you decide which Gemini model to call.
@@ -16,6 +17,14 @@ const InputSchema = z.object({
 export const generatePrompt = createServerFn({ method: "POST" })
   .validator((data: unknown) => InputSchema.parse(data))
   .handler(async ({ data }) => {
+    const clientIp = "global";
+    const { allowed, retryAfterMs } = checkRateLimit(clientIp);
+    if (!allowed) {
+      throw new Error(
+        `Rate limit exceeded. Please wait ${Math.ceil(retryAfterMs / 1000)} seconds before trying again.`,
+      );
+    }
+
     // The API key is read ONLY on the server, from environment variables.
     // It is NEVER sent to the browser. This is why .env files exist.
     if (!(process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY)) {
@@ -49,11 +58,14 @@ export const generatePrompt = createServerFn({ method: "POST" })
         throw new Error("AI credits exhausted. Add credits to keep generating.");
       }
       if (/400/.test(message)) {
-        throw new Error("Gemini rejected the request. Check the model name and API key restrictions.");
+        throw new Error(
+          "Gemini rejected the request. Check the model name and API key restrictions.",
+        );
       }
       if (/401|403|api key|permission/i.test(message)) {
         throw new Error("Invalid API key detected on the server.");
       }
-      throw new Error(`AI request failed: ${message}`);
+      console.error("[generatePrompt] Unexpected AI error:", message);
+      throw new Error("AI request failed. Please try again later.");
     }
   });
