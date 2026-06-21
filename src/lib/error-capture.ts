@@ -5,6 +5,7 @@ let lastCapturedError: { error: unknown; at: number } | undefined;
 const TTL_MS = 5_000;
 
 function record(error: unknown) {
+  console.error("[error-capture] Unhandled error recorded:", error);
   lastCapturedError = { error, at: Date.now() };
 }
 
@@ -18,6 +19,10 @@ if (typeof globalThis.addEventListener === "function") {
 export function consumeLastCapturedError(): unknown {
   if (!lastCapturedError) return undefined;
   if (Date.now() - lastCapturedError.at > TTL_MS) {
+    console.warn(
+      "[error-capture] Captured error expired before consumption (TTL exceeded):",
+      lastCapturedError.error,
+    );
     lastCapturedError = undefined;
     return undefined;
   }
