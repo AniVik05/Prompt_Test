@@ -16,6 +16,11 @@ dist-ssr
 .nitro
 *.local
 
+# Environment files (secrets)
+.env
+.env.*
+!.env.local.example
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars
@@ -30,7 +35,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-.workspace/
 
 .workspace/
