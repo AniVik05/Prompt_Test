@@ -50,19 +50,23 @@ export const generatePrompt = createServerFn({ method: "POST" })
       };
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
-      // Surface common Gemini errors with friendly text.
-      if (/429/.test(message)) {
+      const statusCode =
+        err instanceof Error && "statusCode" in err
+          ? (err as Error & { statusCode: number }).statusCode
+          : undefined;
+
+      if (statusCode === 429) {
         throw new Error("Rate limit reached. Please wait a moment and try again.");
       }
-      if (/402/.test(message)) {
+      if (statusCode === 402) {
         throw new Error("AI credits exhausted. Add credits to keep generating.");
       }
-      if (/400/.test(message)) {
+      if (statusCode === 400) {
         throw new Error(
           "Gemini rejected the request. Check the model name and API key restrictions.",
         );
       }
-      if (/401|403|api key|permission/i.test(message)) {
+      if (statusCode === 401 || statusCode === 403) {
         throw new Error("Invalid API key detected on the server.");
       }
       console.error("[generatePrompt] Unexpected AI error:", message);

@@ -37,23 +37,21 @@ export async function generateGeminiText(prompt: string, model: string) {
     throw new Error("Prompt cannot be empty.");
   }
 
-  const response = await fetch(
-    `${GEMINI_API_BASE_URL}/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: sanitizedPrompt }],
-          },
-        ],
-      }),
+  const response = await fetch(`${GEMINI_API_BASE_URL}/models/${model}:generateContent`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": apiKey,
     },
-  );
+    body: JSON.stringify({
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: sanitizedPrompt }],
+        },
+      ],
+    }),
+  });
 
   let payload: (GeminiGenerateResponse & GeminiErrorResponse) | null = null;
   try {
@@ -72,7 +70,9 @@ export async function generateGeminiText(prompt: string, model: string) {
   if (!response.ok) {
     const message =
       payload?.error?.message ?? `Gemini request failed with status ${response.status}.`;
-    throw new Error(message);
+    const error = new Error(message);
+    (error as Error & { statusCode: number }).statusCode = response.status;
+    throw error;
   }
 
   const text =

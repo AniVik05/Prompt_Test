@@ -58,6 +58,7 @@ function Index() {
   const handleClear = () => {
     setPrompt("");
     setError(null);
+    mutation.reset();
   };
 
   return (
@@ -124,7 +125,7 @@ function Index() {
                 <button
                   type="button"
                   onClick={handleClear}
-                  disabled={isLoading || prompt.length === 0}
+                  disabled={isLoading || (prompt.length === 0 && !result)}
                   className="rounded-lg border border-border bg-transparent px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
                 >
                   Clear Prompt
