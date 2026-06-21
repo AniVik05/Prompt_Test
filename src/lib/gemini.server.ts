@@ -1,4 +1,4 @@
-import process from "node:process";
+import { getGeminiApiKey } from "./api-key.server";
 
 const GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
 
@@ -27,10 +27,7 @@ type GeminiGenerateResponse = {
 };
 
 export async function generateGeminiText(prompt: string, model: string) {
-  const apiKey = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY;
-  if (!apiKey) {
-    throw new Error("Missing GEMINI_API_KEY on the server.");
-  }
+  const apiKey = getGeminiApiKey();
 
   const sanitizedPrompt = prompt.trim().slice(0, 5000);
   if (!sanitizedPrompt) {

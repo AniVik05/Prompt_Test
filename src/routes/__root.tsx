@@ -10,6 +10,9 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import { ERROR_PAGE_TITLE, ERROR_PAGE_DESCRIPTION } from "../lib/error-content";
+import { APP_TITLE, APP_DESCRIPTION, APP_OG_IMAGE } from "../lib/meta";
+import { PRIMARY_BUTTON } from "../lib/styles";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -22,10 +25,7 @@ function NotFoundComponent() {
           The page you're looking for doesn't exist or has been moved.
         </p>
         <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
+          <Link to="/" className={PRIMARY_BUTTON}>
             Go home
           </Link>
         </div>
@@ -44,19 +44,15 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
-        </p>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">{ERROR_PAGE_TITLE}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{ERROR_PAGE_DESCRIPTION}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className={PRIMARY_BUTTON}
           >
             Try again
           </button>
@@ -77,18 +73,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "PROMPT TESTER ANI" },
-      { name: "description", content: "Prompt Tester is a full-stack JavaScript app for learning AI prompt engineering and API integration." },
+      { title: APP_TITLE },
+      { name: "description", content: APP_DESCRIPTION },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "PROMPT TESTER ANI" },
-      { property: "og:description", content: "Prompt Tester is a full-stack JavaScript app for learning AI prompt engineering and API integration." },
+      { property: "og:title", content: APP_TITLE },
+      { property: "og:description", content: APP_DESCRIPTION },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "PROMPT TESTER ANI" },
-      { name: "twitter:description", content: "Prompt Tester is a full-stack JavaScript app for learning AI prompt engineering and API integration." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b8b6e352-ab03-40e2-9b04-2246996e701c/id-preview-2fb5572e--251e79fd-c76b-4f0f-afa7-97df8ed9da67.lovable.app-1781206574540.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b8b6e352-ab03-40e2-9b04-2246996e701c/id-preview-2fb5572e--251e79fd-c76b-4f0f-afa7-97df8ed9da67.lovable.app-1781206574540.png" },
+      { name: "twitter:title", content: APP_TITLE },
+      { name: "twitter:description", content: APP_DESCRIPTION },
+      { property: "og:image", content: APP_OG_IMAGE },
+      { name: "twitter:image", content: APP_OG_IMAGE },
     ],
     links: [
       {

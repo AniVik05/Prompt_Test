@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { getGeminiApiKey } from "./api-key.server";
+import { extractErrorMessage, classifyApiError } from "./error-utils";
 import { generateGeminiText } from "./gemini.server";
 import { checkRateLimit } from "./rate-limit.server";
 
@@ -27,9 +29,7 @@ export const generatePrompt = createServerFn({ method: "POST" })
 
     // The API key is read ONLY on the server, from environment variables.
     // It is NEVER sent to the browser. This is why .env files exist.
-    if (!(process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY)) {
-      throw new Error("Missing GEMINI_API_KEY on the server.");
-    }
+    getGeminiApiKey();
 
     const modelId = MODEL_MAP[data.model];
 
@@ -49,23 +49,6 @@ export const generatePrompt = createServerFn({ method: "POST" })
         usage: result.usage,
       };
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      // Surface common Gemini errors with friendly text.
-      if (/429/.test(message)) {
-        throw new Error("Rate limit reached. Please wait a moment and try again.");
-      }
-      if (/402/.test(message)) {
-        throw new Error("AI credits exhausted. Add credits to keep generating.");
-      }
-      if (/400/.test(message)) {
-        throw new Error(
-          "Gemini rejected the request. Check the model name and API key restrictions.",
-        );
-      }
-      if (/401|403|api key|permission/i.test(message)) {
-        throw new Error("Invalid API key detected on the server.");
-      }
-      console.error("[generatePrompt] Unexpected AI error:", message);
-      throw new Error("AI request failed. Please try again later.");
+      throw new Error(classifyApiError(extractErrorMessage(err)));
     }
   });

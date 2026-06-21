@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { generatePrompt } from "@/lib/generate.functions";
+import { CARD_SECTION } from "@/lib/styles";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -80,7 +81,7 @@ function Index() {
 
         <main className="grid gap-6">
           {/* Prompt + model card */}
-          <section className="rounded-2xl border border-border bg-card p-5 shadow-xl shadow-black/20 sm:p-6">
+          <section className={CARD_SECTION}>
             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <label htmlFor="prompt" className="text-sm font-medium">
                 Your prompt
@@ -156,7 +157,7 @@ function Index() {
 
           {/* Response + API usage */}
           <div className="grid gap-6 lg:grid-cols-3">
-            <section className="rounded-2xl border border-border bg-card p-5 shadow-xl shadow-black/20 sm:p-6 lg:col-span-2">
+            <section className={`${CARD_SECTION} lg:col-span-2`}>
               <h2 className="mb-3 text-lg font-semibold">AI Response</h2>
               {isLoading && (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -185,7 +186,7 @@ function Index() {
               )}
             </section>
 
-            <section className="rounded-2xl border border-border bg-card p-5 shadow-xl shadow-black/20 sm:p-6">
+            <section className={CARD_SECTION}>
               <h2 className="mb-3 text-lg font-semibold">API Usage</h2>
               <p className="mb-4 text-xs text-muted-foreground">
                 Behind the scenes data — useful for understanding API consumption.
@@ -214,7 +215,7 @@ function Index() {
           </div>
 
           {/* Educational panel */}
-          <section className="rounded-2xl border border-border bg-card p-5 shadow-xl shadow-black/20 sm:p-6">
+          <section className={CARD_SECTION}>
             <h2 className="mb-4 text-lg font-semibold">Learning corner</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <LearnCard
