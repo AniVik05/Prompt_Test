@@ -20,7 +20,17 @@ declare global {
 
 export function reportLovableError(error: unknown, context: Record<string, unknown> = {}) {
   if (typeof window === "undefined") return;
-  window.__lovableEvents?.captureException?.(
+
+  if (!window.__lovableEvents?.captureException) {
+    console.error(
+      "[lovable-error-reporting] Error reporting unavailable; logging locally:",
+      error,
+      context,
+    );
+    return;
+  }
+
+  window.__lovableEvents.captureException(
     error,
     {
       source: "react_error_boundary",
